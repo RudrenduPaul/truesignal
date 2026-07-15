@@ -44,16 +44,19 @@ export function stampFallback(
  * On failure, falls back to the last real cache entry for `source`, or returns an empty array if
  * none exists. This function is what every connector's failure path is tested against -- see
  * `no-fabrication.test.ts`.
+ *
+ * A local cache-write failure (disk full, read-only filesystem, permissions) is deliberately kept
+ * out of the fallback path below: it has nothing to do with whether the upstream fetch succeeded,
+ * and treating it the same as a network failure would mislabel data that was genuinely just
+ * fetched live as a stale `fallback` -- the opposite of an honest provenance stamp.
  */
 export async function fetchWithFallback(
   source: string,
   fetchLive: () => Promise<UnstampedItem[]>,
 ): Promise<FeedItem[]> {
+  let raw: UnstampedItem[];
   try {
-    const raw = await fetchLive();
-    const live = stampLive(raw);
-    await writeCache(source, live);
-    return live;
+    raw = await fetchLive();
   } catch {
     const cached = await readCache(source);
     if (!cached || cached.items.length === 0) {
@@ -61,4 +64,13 @@ export async function fetchWithFallback(
     }
     return stampFallback(cached.items, cached.fetchedAt);
   }
+
+  const live = stampLive(raw);
+  try {
+    await writeCache(source, live);
+  } catch {
+    // The fetch genuinely succeeded; a failure to persist it for future fallback use must not
+    // turn this real live data into a mislabeled fallback or drop it.
+  }
+  return live;
 }

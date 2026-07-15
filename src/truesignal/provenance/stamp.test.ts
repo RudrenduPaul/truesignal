@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -106,5 +106,22 @@ describe('fetchWithFallback', () => {
     const items = await fetchWithFallback('gdelt', failingFetch);
 
     expect(items).toEqual([]);
+  });
+
+  it('still returns real live data, stamped live, when the upstream fetch succeeds but the local cache write fails', async () => {
+    // Force writeCache's mkdir(dir, { recursive: true }) to fail with ENOTDIR regardless of the
+    // OS user's privileges (a chmod-based permission test is unreliable when tests run as root,
+    // e.g. in a container, since root bypasses filesystem permission checks): make a path segment
+    // of the cache directory a regular file instead of a directory.
+    const blockerPath = join(tempDir, 'blocked-by-a-file');
+    await writeFile(blockerPath, 'not a directory', 'utf-8');
+    process.env['TRUESIGNAL_CACHE_DIR'] = join(blockerPath, 'cache');
+
+    const fetchLive = vi.fn().mockResolvedValue([unstamped]);
+    const items = await fetchWithFallback('gdelt', fetchLive);
+
+    // The upstream fetch genuinely succeeded -- a local disk error persisting it to cache must
+    // never downgrade real live data into a mislabeled fallback, or silently drop it.
+    expect(items).toEqual([{ ...unstamped, status: 'live' }]);
   });
 });
