@@ -89,4 +89,37 @@ describe('cisaKevConnector', () => {
     const items = await cisaKevConnector.fetchItems();
     expect(items).toEqual([]);
   });
+
+  it('skips a single malformed record rather than discarding the whole batch', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse({
+          vulnerabilities: [
+            {
+              cveID: 'CVE-2026-22222',
+              vendorProject: 'Acme',
+              product: 'Gadget',
+              vulnerabilityName: 'Valid Entry',
+              dateAdded: '2026-04-01',
+              shortDescription: 'A real, well-formed record.',
+            },
+            {
+              cveID: 'CVE-2026-33333',
+              vendorProject: 'Acme',
+              product: 'Gadget',
+              vulnerabilityName: 'Malformed Entry',
+              dateAdded: 'not-a-real-date',
+              shortDescription: 'A record with an unparseable dateAdded.',
+            },
+          ],
+        }),
+      ),
+    );
+
+    const items = await cisaKevConnector.fetchItems();
+
+    expect(items).toHaveLength(1);
+    expect(items[0]?.id).toBe('cisa-kev:CVE-2026-22222');
+  });
 });

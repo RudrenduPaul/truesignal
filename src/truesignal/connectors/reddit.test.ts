@@ -99,6 +99,51 @@ describe('redditConnector', () => {
     expect(items).toEqual([]);
   });
 
+  it('skips a single malformed record rather than discarding the whole batch', async () => {
+    process.env['REDDIT_CLIENT_ID'] = 'fake-id';
+    process.env['REDDIT_CLIENT_SECRET'] = 'fake-secret';
+    const fetchMock = vi.fn().mockImplementation(async (input: string | URL) => {
+      const url = input.toString();
+      if (url.includes('access_token')) {
+        return jsonResponse({ access_token: 'fake-token', token_type: 'bearer', expires_in: 3600 });
+      }
+      return jsonResponse({
+        data: {
+          children: [
+            {
+              data: {
+                id: 'valid1',
+                title: 'Valid post',
+                permalink: '/r/netsec/comments/valid1/valid_post/',
+                created_utc: 1750000000,
+                subreddit: 'netsec',
+              },
+            },
+            {
+              data: {
+                id: 'malformed1',
+                title: 'Malformed post',
+                permalink: '/r/netsec/comments/malformed1/malformed_post/',
+                // Not a real Unix timestamp -- some upstream APIs occasionally emit a
+                // non-numeric or missing value here. `NaN` itself round-trips through JSON as
+                // `null`, so a clearly-invalid string is used to force the same failure mode a
+                // truly malformed field would produce.
+                created_utc: 'not-a-real-timestamp',
+                subreddit: 'netsec',
+              },
+            },
+          ],
+        },
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const items = await redditConnector.fetchItems();
+
+    expect(items).toHaveLength(1);
+    expect(items[0]?.id).toBe('reddit:valid1');
+  });
+
   it('respects REDDIT_SUBREDDIT when set', async () => {
     process.env['REDDIT_CLIENT_ID'] = 'fake-id';
     process.env['REDDIT_CLIENT_SECRET'] = 'fake-secret';

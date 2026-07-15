@@ -68,6 +68,39 @@ describe('cloudflareRadarConnector', () => {
     expect(items).toEqual([]);
   });
 
+  it('skips a single malformed record rather than discarding the whole batch', async () => {
+    process.env['CLOUDFLARE_RADAR_API_TOKEN'] = 'fake-token';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse({
+          success: true,
+          result: {
+            trafficAnomalies: [
+              {
+                uuid: 'valid-anomaly',
+                startDate: '2026-02-01T00:00:00Z',
+                type: 'outage',
+                locationDetails: { name: 'Testland' },
+              },
+              {
+                uuid: 'malformed-anomaly',
+                startDate: 'not-a-real-date',
+                type: 'outage',
+                locationDetails: { name: 'Otherland' },
+              },
+            ],
+          },
+        }),
+      ),
+    );
+
+    const items = await cloudflareRadarConnector.fetchItems();
+
+    expect(items).toHaveLength(1);
+    expect(items[0]?.id).toBe('cloudflare-radar:valid-anomaly');
+  });
+
   it('uses the location name when no ASN details are present', async () => {
     process.env['CLOUDFLARE_RADAR_API_TOKEN'] = 'fake-token';
     vi.stubGlobal(

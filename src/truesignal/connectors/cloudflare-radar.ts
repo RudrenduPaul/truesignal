@@ -40,7 +40,14 @@ function isConfigured(): boolean {
   return Boolean(process.env[TOKEN_ENV_VAR]?.trim());
 }
 
-function toUnstampedItem(anomaly: RadarTrafficAnomaly): UnstampedItem {
+function toUnstampedItem(anomaly: RadarTrafficAnomaly): UnstampedItem | null {
+  // startDate from Radar is expected to be a real ISO-8601 instant. A single anomaly with a
+  // missing or malformed startDate is skipped rather than thrown -- one bad record in an
+  // otherwise-good batch must not take down every other real item alongside it.
+  const parsed = new Date(anomaly.startDate);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
   const subject = anomaly.asnDetails?.name ?? anomaly.locationDetails?.name ?? 'Unknown network';
   const anomalyType = anomaly.type ?? 'traffic anomaly';
   return {
@@ -48,7 +55,7 @@ function toUnstampedItem(anomaly: RadarTrafficAnomaly): UnstampedItem {
     source: 'cloudflare-radar',
     title: `${subject}: ${anomalyType}`,
     url: `https://radar.cloudflare.com/anomalies/${anomaly.uuid}`,
-    timestamp: new Date(anomaly.startDate).toISOString(),
+    timestamp: parsed.toISOString(),
     ...(anomaly.asnDetails?.asn ? { summary: `AS${anomaly.asnDetails.asn}` } : {}),
   };
 }
@@ -73,7 +80,7 @@ async function fetchLive(): Promise<UnstampedItem[]> {
     throw new Error('Cloudflare Radar API reported success: false');
   }
   const anomalies = data.result?.trafficAnomalies ?? [];
-  return anomalies.map(toUnstampedItem);
+  return anomalies.map(toUnstampedItem).filter((item): item is UnstampedItem => item !== null);
 }
 
 export const cloudflareRadarConnector: Connector = {

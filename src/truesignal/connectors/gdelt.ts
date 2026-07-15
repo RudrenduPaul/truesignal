@@ -36,13 +36,22 @@ function parseGdeltDate(seendate: string): string {
   return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`).toISOString();
 }
 
-function toUnstampedItem(article: GdeltArticle): UnstampedItem {
+function toUnstampedItem(article: GdeltArticle): UnstampedItem | null {
+  // A single article with an unrecognized seendate format is skipped rather than thrown --
+  // one bad record in an otherwise-good batch must not take down every other real item
+  // alongside it.
+  let timestamp: string;
+  try {
+    timestamp = parseGdeltDate(article.seendate);
+  } catch {
+    return null;
+  }
   return {
     id: `gdelt:${article.url}`,
     source: 'gdelt',
     title: article.title,
     url: article.url,
-    timestamp: parseGdeltDate(article.seendate),
+    timestamp,
     summary: article.sourcecountry
       ? `${article.domain} (${article.sourcecountry})`
       : article.domain,
@@ -63,7 +72,7 @@ async function fetchLive(): Promise<UnstampedItem[]> {
   }
   const data = (await response.json()) as GdeltResponse;
   const articles = data.articles ?? [];
-  return articles.map(toUnstampedItem);
+  return articles.map(toUnstampedItem).filter((item): item is UnstampedItem => item !== null);
 }
 
 export const gdeltConnector: Connector = {

@@ -71,13 +71,20 @@ async function fetchAccessToken(clientId: string, clientSecret: string): Promise
   return data.access_token;
 }
 
-function toUnstampedItem(post: RedditPost): UnstampedItem {
+function toUnstampedItem(post: RedditPost): UnstampedItem | null {
+  // created_utc is expected to be a real Unix timestamp. A single post with a missing or
+  // malformed created_utc is skipped rather than thrown -- one bad record in an otherwise-good
+  // batch must not take down every other real item alongside it.
+  const parsed = new Date(post.created_utc * 1000);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
   return {
     id: `reddit:${post.id}`,
     source: 'reddit',
     title: post.title,
     url: `https://reddit.com${post.permalink}`,
-    timestamp: new Date(post.created_utc * 1000).toISOString(),
+    timestamp: parsed.toISOString(),
     summary: `r/${post.subreddit}`,
   };
 }
@@ -104,7 +111,9 @@ async function fetchLive(): Promise<UnstampedItem[]> {
   }
   const data = (await response.json()) as RedditListingResponse;
   const children = data.data?.children ?? [];
-  return children.map((child) => toUnstampedItem(child.data));
+  return children
+    .map((child) => toUnstampedItem(child.data))
+    .filter((item): item is UnstampedItem => item !== null);
 }
 
 export const redditConnector: Connector = {

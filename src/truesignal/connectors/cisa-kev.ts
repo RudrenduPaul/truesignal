@@ -26,16 +26,21 @@ interface CisaKevResponse {
   vulnerabilities: CisaKevVulnerability[];
 }
 
-function toUnstampedItem(vuln: CisaKevVulnerability): UnstampedItem {
+function toUnstampedItem(vuln: CisaKevVulnerability): UnstampedItem | null {
   // dateAdded from CISA is a bare date ("2026-07-10"); treat it as midnight UTC so it is a real,
-  // parseable ISO-8601 instant rather than a fabricated time-of-day.
-  const timestamp = new Date(`${vuln.dateAdded}T00:00:00.000Z`).toISOString();
+  // parseable ISO-8601 instant rather than a fabricated time-of-day. A single record with a
+  // missing or malformed dateAdded is skipped rather than thrown -- one bad record in an
+  // otherwise-good batch must not take down every other real item alongside it.
+  const parsed = new Date(`${vuln.dateAdded}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
   return {
     id: `cisa-kev:${vuln.cveID}`,
     source: 'cisa-kev',
     title: `${vuln.cveID}: ${vuln.vulnerabilityName}`,
     url: `https://nvd.nist.gov/vuln/detail/${vuln.cveID}`,
-    timestamp,
+    timestamp: parsed.toISOString(),
     summary: `${vuln.vendorProject} ${vuln.product} -- ${vuln.shortDescription}`,
   };
 }
@@ -53,7 +58,8 @@ async function fetchLive(): Promise<UnstampedItem[]> {
     .slice()
     .sort((a, b) => (a.dateAdded < b.dateAdded ? 1 : -1))
     .slice(0, CISA_KEV_MAX_ITEMS)
-    .map(toUnstampedItem);
+    .map(toUnstampedItem)
+    .filter((item): item is UnstampedItem => item !== null);
 }
 
 export const cisaKevConnector: Connector = {

@@ -64,7 +64,7 @@ describe('gdeltConnector', () => {
     expect(items).toEqual([]);
   });
 
-  it('falls back rather than crashing on an unparseable seendate', async () => {
+  it('skips rather than crashing when the only article has an unparseable seendate', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
@@ -88,5 +88,34 @@ describe('gdeltConnector', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({}, 500)));
     const items = await gdeltConnector.fetchItems();
     expect(items).toEqual([]);
+  });
+
+  it('skips a single malformed record rather than discarding the whole batch', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse({
+          articles: [
+            {
+              url: 'https://example.com/news/valid',
+              title: 'Valid article',
+              seendate: '20260315T134500Z',
+              domain: 'example.com',
+            },
+            {
+              url: 'https://example.com/news/malformed',
+              title: 'Malformed article',
+              seendate: 'not-a-real-date',
+              domain: 'example.com',
+            },
+          ],
+        }),
+      ),
+    );
+
+    const items = await gdeltConnector.fetchItems();
+
+    expect(items).toHaveLength(1);
+    expect(items[0]?.id).toBe('gdelt:https://example.com/news/valid');
   });
 });
