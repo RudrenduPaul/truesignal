@@ -5,7 +5,7 @@
  * Requires a free Reddit developer app (script or web app type) via REDDIT_CLIENT_ID and
  * REDDIT_CLIENT_SECRET. Never scrapes the unauthenticated `.json` endpoints -- that path violates
  * Reddit's API terms of service, which is exactly the failure mode this connector exists to not
- * repeat (see Crucix issue #108 in the public issue tracker).
+ * repeat (see github.com/calesthio/Crucix issue #108).
  */
 import { fetchWithFallback, type UnstampedItem } from '../provenance/index.js';
 import { ConnectorNotConfiguredError, type Connector } from '../types.js';

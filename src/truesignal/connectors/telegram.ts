@@ -3,8 +3,8 @@
  * `getUpdates` method. Requires a free bot token (from @BotFather) via TELEGRAM_BOT_TOKEN.
  *
  * Never scrapes `t.me/s/*` with a spoofed User-Agent -- that path violates Telegram's terms of
- * service, which is exactly the failure mode this connector exists to not repeat (see Crucix
- * issue #110 in the public issue tracker).
+ * service, which is exactly the failure mode this connector exists to not repeat (see
+ * github.com/calesthio/Crucix issue #110).
  *
  * Real API constraint, not a workaround: the Bot API only surfaces updates for chats the bot has
  * been added to as a member/admin, via long-polling `getUpdates`. Posts from a chat with no

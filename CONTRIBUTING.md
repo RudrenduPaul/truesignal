@@ -86,3 +86,10 @@ explicitly in the title -- that class of bug gets fixed first.
 Formatting is enforced by Prettier and linting by ESLint; run `npm run format:write` before
 committing if `prettier --check` complains. There's no separate style guide beyond what those
 tools already enforce.
+
+## A note on internal docs
+
+This repo never carries a `***`, `TODOS.md`, or `BRANCH_PROTECTION.md` at its root, and
+never references an internal build/review process in code comments or commit messages. CI
+enforces this (`.github/workflows/no-internal-docs.yml`). If you're restoring from an older
+local branch or fork, don't reintroduce any of those files.

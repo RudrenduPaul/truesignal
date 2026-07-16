@@ -1,0 +1,43 @@
+name: No internal docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: Check for internal-only content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forbidden filenames
+        run: |
+          hits=$(find . -type f \( \
+            -iname '***' -o \
+            -iname 'TODOS.md' -o \
+            -iname 'BRANCH_PROTECTION.md' \
+          \) -not -path './node_modules/*')
+          if [ -n "$hits" ]; then
+            echo "Found file(s) that should never be committed to this public repo:"
+            echo "$hits"
+            echo "These carry internal build-process or business-strategy content. Remove them."
+            exit 1
+          fi
+
+      - name: Internal-process language in tracked files
+        run: |
+          pattern='***|office.?hours|eng.?review|***|*** review|*** threat.?model|/oss-[0-9]+-[a-z-]+|/plan-***|***|***|***|fundrais|investor.?outreach|WTP test|Assumption [0-9]|execution.?plan|falsification condition'
+          hits=$(grep -rniE "$pattern" \
+            --include='*.md' --include='*.ts' --include='*.tsx' --include='*.js' \
+            --include='*.yml' --include='*.yaml' --include='*.json' \
+            --exclude-dir=node_modules --exclude-dir=.git .) || true
+          if [ -n "$hits" ]; then
+            echo "Found internal-process or business-strategy language in a tracked file:"
+            echo "$hits"
+            echo "This repo is public. Reword to a neutral engineering rationale, or move the"
+            echo "content to the private strategy repo instead."
+            exit 1
+          fi
