@@ -60,8 +60,13 @@ export function formatInitReport(statuses: readonly ConnectorStatus[]): string {
     lines.push(
       'No connectors are usable. This should not happen -- CISA-KEV and GDELT need no configuration.',
     );
-  } else if (readyCount < statuses.length) {
-    lines.push('Set the missing environment variables above to enable the rest. See .env.example.');
+  } else {
+    if (readyCount < statuses.length) {
+      lines.push(
+        'Set the missing environment variables above to enable the rest. See .env.example.',
+      );
+    }
+    lines.push('Next: run "truesignal feed" to see your feed now.');
   }
   return lines.join('\n');
 }

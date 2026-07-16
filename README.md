@@ -51,7 +51,9 @@ Requires Node.js 18.17 or later.
 | Telegram (official Bot API)                     | Yes, free    | `TELEGRAM_BOT_TOKEN`                       |
 
 CISA-KEV and GDELT work with zero configuration. Copy `.env.example` to `.env` and fill in real
-(free) credentials to enable the other three -- see that file for where to get each one.
+(free) credentials to enable the other three -- see that file for where to get each one. truesignal
+does not auto-load `.env`; export the values into your shell first, e.g.
+`set -a && source .env && set +a`.
 
 ## CLI reference
 
