@@ -33,7 +33,8 @@ jobs:
           hits=$(grep -rniE "$pattern" \
             --include='*.md' --include='*.ts' --include='*.tsx' --include='*.js' \
             --include='*.yml' --include='*.yaml' --include='*.json' \
-            --exclude-dir=node_modules --exclude-dir=.git .) || true
+            --exclude-dir=node_modules --exclude-dir=.git \
+            --exclude='no-internal-docs.yml' .) || true
           if [ -n "$hits" ]; then
             echo "Found internal-process or business-strategy language in a tracked file:"
             echo "$hits"
