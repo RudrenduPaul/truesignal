@@ -1,16 +1,16 @@
 # Benchmarks
 
 This directory holds reproducible benchmarks for truesignal. Every number in the main
-[README](../README.md)'s comparison table traces back to one of the commands below -- no
-benchmark claim is ever stated without a command whose output reproduces it.
+[README](../README.md)'s comparison table traces back to one of the commands below: every
+benchmark claim is backed by a command whose output reproduces it.
 
 To add a new benchmark, drop a runnable `.ts` file in this directory that prints its result to
 stdout, and document the exact command to reproduce it here.
 
 ## No-fabrication guarantee (the core product claim)
 
-The single most important test in this repo. It proves that every connector's failure path
-returns real cached `fallback` data or nothing -- never invented, randomized, or silently
+The single most important test in this repo: it proves that every connector's failure path
+returns real cached `fallback` data or nothing, never invented, randomized, or silently
 relabeled-as-current data.
 
 ```bash
@@ -63,7 +63,7 @@ network calls to CISA-KEV and GDELT and will vary run to run and by network cond
 No performance number is published for Crucix, SpiderFoot, or IntelOwl in the README's
 comparison table. Crucix's exemplar issues are cited by GitHub issue number and verified live
 against the real repo (see the README's comparison table and its date stamp); SpiderFoot and
-IntelOwl are compared on real, cited facts (license, install model, scope) rather than a
-performance number, because none of the three were installed and run end to end in this pass.
+IntelOwl are compared only on real, cited facts (license, install model, scope), because none of
+the three were installed and run end to end in this pass.
 Fabricating a number for a tool nobody ran here would violate the same no-fabrication principle
 this project is built around.
