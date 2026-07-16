@@ -41,7 +41,9 @@ const totalMs = buildMs + initMs + feedMs;
 console.log('Setup time (fresh build -> init -> feed, zero env vars set):');
 console.log(`  npm run build: ${(buildMs / 1000).toFixed(2)}s`);
 console.log(`  truesignal init: ${(initMs / 1000).toFixed(2)}s`);
-console.log(`  truesignal feed (all 5 connectors, 2 usable with zero config): ${(feedMs / 1000).toFixed(2)}s`);
+console.log(
+  `  truesignal feed (all 5 connectors, 2 usable with zero config): ${(feedMs / 1000).toFixed(2)}s`,
+);
 console.log(`  total: ${(totalMs / 1000).toFixed(2)}s`);
 console.log(
   '  (feed time is dominated by real live network calls to CISA-KEV and GDELT -- varies run to run)',
