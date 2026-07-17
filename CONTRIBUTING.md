@@ -2,9 +2,12 @@
 
 Thanks for looking at truesignal. This project has one rule that overrides everything else:
 **never let a connector fabricate, randomize, or silently replay stale data as if it were live.**
-Every other guideline below exists to support that one.
+Every other guideline below exists to support that one. It applies equally to both codebases in
+this repo -- the TypeScript/npm package (`src/`) and the Python/PyPI package (`python/`), which
+are independent, behaviorally-equivalent ports of the same five connectors and the same
+provenance-stamping guarantee.
 
-## Getting set up
+## Getting set up -- TypeScript/npm
 
 ```bash
 git clone https://github.com/RudrenduPaul/truesignal.git
@@ -17,6 +20,22 @@ npm test
 CISA-KEV and GDELT need no API keys, so `npm test` and local development work with zero setup.
 To exercise the other three connectors locally, copy `.env.example` to `.env` and fill in real
 (free) credentials for the sources you want to test against.
+
+## Getting set up -- Python/PyPI
+
+```bash
+git clone https://github.com/RudrenduPaul/truesignal.git
+cd truesignal/python
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+pytest
+```
+
+Same zero-setup story: CISA-KEV and GDELT need no API keys, so `pytest` works out of the box.
+Copy the repo-root `.env.example` to `.env` and export it (`set -a && source ../.env && set +a`)
+to exercise the other three connectors locally. There is no enforced minimum coverage threshold
+today; the bar is that the full pytest suite passes and new behavior ships with tests, including
+an addition to `python/tests/test_no_fabrication.py` for any new or changed connector.
 
 ## Before you open a pull request
 
@@ -37,10 +56,22 @@ npm audit --audit-level=high
   test (`src/truesignal/provenance/no-fabrication.test.ts`) enforces this both by behavior and by
   scanning connector source files directly -- it will fail your PR if either check trips.
 
+If your change touches a connector or the provenance layer, run the equivalent Python checks too
+(`cd python && pytest`) -- `python/tests/test_no_fabrication.py` enforces the identical guarantee
+against `python/src/truesignal/connectors/`, scanning for `random.random()`, a fake-data library,
+and `datetime.now()` used to construct a timestamp. A rule-pack or connector change that lands in
+only one of the two codebases is an incomplete PR.
+
 ## Adding a new connector
 
 This is the extensibility point this project is built around. Every source lives behind the same
-`Connector` interface (`src/truesignal/types.ts`), so adding one is a scoped, additive change:
+`Connector` interface, so adding one is a scoped, additive change -- in both codebases, since they
+must stay in behavioral parity. Steps below are written for the TypeScript source
+(`src/truesignal/types.ts`); the Python port (`python/src/truesignal/types.py`) mirrors the same
+interface with snake_case names (`requires_config`, `config_env_vars`, `is_configured()`,
+`fetch_items()`) -- see `python/src/truesignal/connectors/gdelt.py` for the simplest Python
+example (no auth) or `python/src/truesignal/connectors/reddit.py` for one needing OAuth
+credentials.
 
 1. **Create `src/truesignal/connectors/<your-source>.ts`.** Look at `src/truesignal/connectors/gdelt.ts`
    for the simplest example (no auth) or `src/truesignal/connectors/reddit.ts` for one that needs

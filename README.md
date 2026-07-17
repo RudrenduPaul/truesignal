@@ -6,6 +6,7 @@ invented data point.
 
 [![CI](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![PyPI version](https://img.shields.io/pypi/v/truesignal.svg)](https://pypi.org/project/truesignal/)
 <!-- TODO: add an npm version badge once truesignal-cli is published to the npm registry -->
 
 <!-- TODO: record a real demo GIF -->
@@ -38,6 +39,11 @@ ages are real.
 
 ## Install
 
+TrueSignal ships as two independent, equally first-class packages -- pick whichever fits your
+toolchain, or install both:
+
+**npm (JS/TS CLI):**
+
 ```bash
 git clone https://github.com/RudrenduPaul/truesignal.git && cd truesignal && npm install && npm run build && node dist/cli.js init
 ```
@@ -48,6 +54,17 @@ Requires Node.js 18.17 or later. Verified working from a clean scratch clone on 
 
 For repeat use, `npm link` after building gives you the `truesignal` command directly instead of
 typing `node dist/cli.js`.
+
+**pip (Python library + CLI):**
+
+```bash
+pip install truesignal
+```
+
+A genuine, independent Python port -- not a wrapper around the Node binary -- with the same five
+connectors, the same provenance-stamping guarantee, and the same `init`/`feed`/`verify` CLI
+surface. See [python/README.md](./python/README.md) for the Python-specific quickstart. Both
+packages are maintained together; neither is deprecated in favor of the other.
 
 ## Table of contents
 
@@ -282,6 +299,20 @@ completely standalone.
 Yes -- every connector implements one shared `Connector` interface, so adding a new source (NVD,
 Shodan, VirusTotal, etc.) is a scoped, additive change. See
 [CONTRIBUTING.md](./CONTRIBUTING.md#adding-a-new-connector) for the exact steps.
+
+**npm or pip -- which should I use?**
+Whichever matches your toolchain. Both are genuine, independent implementations of the same five
+connectors and the same no-fabrication guarantee (the Python package is not a wrapper around the
+Node binary), kept in behavioral parity. Field names follow each language's own convention
+(`fallbackAgeSeconds` in TypeScript, `fallback_age_seconds` in Python); everything else about the
+data and CLI surface is the same. See [python/README.md](./python/README.md) for the
+Python-specific docs.
+
+## Security
+
+To report a vulnerability, see [SECURITY.md](./SECURITY.md) for the private disclosure process
+and what counts as in scope (in short: anything that lets an item's `url` or `timestamp` be
+shown without really coming from a live upstream fetch or an honestly-labeled cache entry).
 
 ## Contributing
 
