@@ -9,10 +9,10 @@ logs or cached files) is taken seriously and handled as a priority.
 
 ## Supported versions
 
-| Package | Version | Supported |
-| --- | --- | --- |
-| `truesignal-cli` (npm) | 0.1.x | Yes |
-| `truesignal` (PyPI) | 0.1.x | Yes |
+| Package                | Version | Supported |
+| ---------------------- | ------- | --------- |
+| `truesignal-cli` (npm) | 0.1.x   | Yes       |
+| `truesignal` (PyPI)    | 0.1.x   | Yes       |
 
 Both distributions are pre-1.0 and under active development. Security fixes
 land on the latest `0.1.x` release of each; there is no older supported

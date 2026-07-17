@@ -66,10 +66,10 @@ item is gone, and `3` on a network error re-fetching it -- a plain shell
 step can gate a job on that directly:
 
 ```yaml
-      - name: Confirm a specific CVE is still tracked live
-        run: |
-          pip install truesignal
-          truesignal verify cisa-kev:CVE-2026-12345
+- name: Confirm a specific CVE is still tracked live
+  run: |
+    pip install truesignal
+    truesignal verify cisa-kev:CVE-2026-12345
 ```
 
 ## Configuring the paid/free-key connectors in CI
@@ -80,9 +80,9 @@ auto-loads a `.env` file. In GitHub Actions, store the value as a repository
 secret and wire it in via `env:`:
 
 ```yaml
-      - run: truesignal feed --source cloudflare-radar
-        env:
-          CLOUDFLARE_RADAR_API_TOKEN: ${{ secrets.CLOUDFLARE_RADAR_API_TOKEN }}
+- run: truesignal feed --source cloudflare-radar
+  env:
+    CLOUDFLARE_RADAR_API_TOKEN: ${{ secrets.CLOUDFLARE_RADAR_API_TOKEN }}
 ```
 
 ## Choosing what to automate

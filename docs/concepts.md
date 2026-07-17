@@ -30,16 +30,16 @@ current.
 
 ## The FeedItem shape
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `id` | string | `"{source}:{native-id}"`, e.g. `cisa-kev:CVE-2026-12345` |
-| `source` | string | The connector name, e.g. `cisa-kev` |
-| `title` | string | Human-readable title |
-| `url` | string | A real, dereferenceable link to the specific upstream item -- never a generic homepage |
-| `timestamp` | string | A real ISO-8601 instant from the upstream source, never `new Date()`/`datetime.now()` |
-| `status` | `"live"` \| `"fallback"` | Whether this item came from a fetch just now, or cached data |
-| `fallback_age_seconds` / `fallbackAgeSeconds` | integer, optional | Present only when `status` is `fallback`: real seconds since the item was last fetched live |
-| `summary` | string, optional | Short human-readable context, when the upstream source provides one |
+| Field                                         | Type                     | Notes                                                                                       |
+| --------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| `id`                                          | string                   | `"{source}:{native-id}"`, e.g. `cisa-kev:CVE-2026-12345`                                    |
+| `source`                                      | string                   | The connector name, e.g. `cisa-kev`                                                         |
+| `title`                                       | string                   | Human-readable title                                                                        |
+| `url`                                         | string                   | A real, dereferenceable link to the specific upstream item -- never a generic homepage      |
+| `timestamp`                                   | string                   | A real ISO-8601 instant from the upstream source, never `new Date()`/`datetime.now()`       |
+| `status`                                      | `"live"` \| `"fallback"` | Whether this item came from a fetch just now, or cached data                                |
+| `fallback_age_seconds` / `fallbackAgeSeconds` | integer, optional        | Present only when `status` is `fallback`: real seconds since the item was last fetched live |
+| `summary`                                     | string, optional         | Short human-readable context, when the upstream source provides one                         |
 
 Python field names are snake_case (`fallback_age_seconds`); TypeScript
 field names are camelCase (`fallbackAgeSeconds`) -- each following its own
@@ -98,13 +98,13 @@ fetch -- exactly the case `fetch_with_fallback` exists to handle honestly.
 
 ## Exit codes
 
-| Code | Meaning |
-| --- | --- |
-| `0` | Success |
-| `1` | General/unexpected error (e.g. `feed --source` named an unknown connector) |
-| `2` | No connectors configured to run for this command |
-| `3` | A configured connector's fetch failed with no fallback data to show |
-| `4` | `verify <item-id>` was given an id that doesn't parse or names an unknown source |
+| Code | Meaning                                                                          |
+| ---- | -------------------------------------------------------------------------------- |
+| `0`  | Success                                                                          |
+| `1`  | General/unexpected error (e.g. `feed --source` named an unknown connector)       |
+| `2`  | No connectors configured to run for this command                                 |
+| `3`  | A configured connector's fetch failed with no fallback data to show              |
+| `4`  | `verify <item-id>` was given an id that doesn't parse or names an unknown source |
 
 ## Extending: adding a new connector
 
