@@ -24,8 +24,8 @@ python3 examples/02-ci-gate/gate.py
 python3 examples/03-agent-native-json/agent_report.py
 ```
 
-| Example | What it demonstrates |
-| --- | --- |
-| [01-init-and-feed](./01-init-and-feed/) | The core library call: checking `is_configured()` across `ALL_CONNECTORS`, then pulling a real live feed from the zero-config `cisa-kev` connector. |
-| [02-ci-gate](./02-ci-gate/) | Using `fetch_items()` as a CI gate: pulls the real live `gdelt` feed and exits non-zero if the fetch produced neither live nor fallback data -- suitable to drop into a CI script directly. |
+| Example                                         | What it demonstrates                                                                                                                                                                           |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [01-init-and-feed](./01-init-and-feed/)         | The core library call: checking `is_configured()` across `ALL_CONNECTORS`, then pulling a real live feed from the zero-config `cisa-kev` connector.                                            |
+| [02-ci-gate](./02-ci-gate/)                     | Using `fetch_items()` as a CI gate: pulls the real live `gdelt` feed and exits non-zero if the fetch produced neither live nor fallback data -- suitable to drop into a CI script directly.    |
 | [03-agent-native-json](./03-agent-native-json/) | The agent-native use case: calling TrueSignal in-process (no CLI subprocess), serializing structured `FeedItem`s to JSON, and using `run_verify()` to re-confirm a specific item's provenance. |
