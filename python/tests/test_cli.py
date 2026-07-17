@@ -1,5 +1,5 @@
 """End-to-end CLI tests, one pytest module per src/truesignal/cli.ts's subcommands. Exercises
-run_cli() directly (no subprocess) same as skillguard's Python port's test_cli.py."""
+run_cli() directly (no subprocess) for fast, in-process end-to-end coverage."""
 import json
 
 from truesignal.cli import run_cli

@@ -114,13 +114,32 @@ function relativeAge(timestamp: string, now: Date): string {
   return `${days}d ago`;
 }
 
+// Matches C0 controls (except handled separately), DEL, and C1 controls -- built from explicit
+// \xNN escapes rather than a literal character class so no raw control byte ever sits in this
+// source file.
+// eslint-disable-next-line no-control-regex -- intentional: stripping control chars is the point
+const CONTROL_CHAR_PATTERN = new RegExp('[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]', 'g');
+
+/**
+ * Strips control characters (C0/C1, DEL) from untrusted upstream text before it reaches a
+ * terminal. Reddit and Telegram content is attacker-controlled -- a crafted post title or
+ * message could otherwise carry ANSI/OSC escape sequences (cursor manipulation, terminal-title
+ * spoofing, an OSC-8 hyperlink escape that visually disguises the printed URL) straight into
+ * the user's terminal via `console.log`.
+ */
+function sanitizeForTerminal(text: string): string {
+  return text.replace(CONTROL_CHAR_PATTERN, '');
+}
+
 /** Formats one feed item as a single human-readable line. */
 export function formatFeedItemHuman(item: FeedItem, now = new Date()): string {
   const tag =
     item.status === 'live'
       ? '[live]'
       : `[fallback, ${formatDuration(item.fallbackAgeSeconds ?? 0)} old]`;
-  return `${tag} ${item.source}: ${item.title} -- ${item.url} -- ${relativeAge(item.timestamp, now)}`;
+  const title = sanitizeForTerminal(item.title);
+  const url = sanitizeForTerminal(item.url);
+  return `${tag} ${item.source}: ${title} -- ${url} -- ${relativeAge(item.timestamp, now)}`;
 }
 
 function formatDuration(seconds: number): string {
