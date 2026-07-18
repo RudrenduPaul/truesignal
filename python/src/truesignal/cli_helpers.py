@@ -8,6 +8,7 @@ convention) where the TypeScript source uses camelCase.
 from __future__ import annotations
 
 import concurrent.futures
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import IntEnum
@@ -143,6 +144,20 @@ def _format_duration(seconds: int) -> str:
     return f"{days}d"
 
 
+_CONTROL_CHAR_PATTERN = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+
+
+def _sanitize_for_terminal(text: str) -> str:
+    """
+    Strips control characters (C0/C1, DEL) from untrusted upstream text before it reaches a
+    terminal. Reddit and Telegram content is attacker-controlled -- a crafted post title or
+    message could otherwise carry ANSI/OSC escape sequences (cursor manipulation, terminal-title
+    spoofing, an OSC-8 hyperlink escape that visually disguises the printed URL) straight into
+    the user's terminal via `print`.
+    """
+    return _CONTROL_CHAR_PATTERN.sub("", text)
+
+
 def format_feed_item_human(item: FeedItem, now: Optional[datetime] = None) -> str:
     """Formats one feed item as a single human-readable line."""
     now = now or datetime.now(timezone.utc)
@@ -150,7 +165,9 @@ def format_feed_item_human(item: FeedItem, now: Optional[datetime] = None) -> st
         tag = "[live]"
     else:
         tag = f"[fallback, {_format_duration(item.fallback_age_seconds or 0)} old]"
-    return f"{tag} {item.source}: {item.title} -- {item.url} -- {_relative_age(item.timestamp, now)}"
+    title = _sanitize_for_terminal(item.title)
+    url = _sanitize_for_terminal(item.url)
+    return f"{tag} {item.source}: {title} -- {url} -- {_relative_age(item.timestamp, now)}"
 
 
 def parse_item_id(item_id: str) -> Optional[Tuple[str, str]]:

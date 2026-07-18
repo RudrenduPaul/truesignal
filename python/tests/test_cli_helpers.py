@@ -1,4 +1,5 @@
 """Port of src/truesignal/cli-helpers.test.ts."""
+import re
 from datetime import datetime, timezone
 
 from truesignal.cli_helpers import (
@@ -138,6 +139,22 @@ def test_format_feed_item_human_formats_a_fallback_item_with_its_honest_cached_a
     line = format_feed_item_human(FALLBACK_ITEM, now)
     assert "[fallback," in line
     assert "1h old" in line
+
+
+def test_format_feed_item_human_strips_control_characters_from_attacker_controlled_fields():
+    now = datetime(2026, 7, 1, 0, 5, 0, tzinfo=timezone.utc)
+    malicious_item = FeedItem(
+        id=LIVE_ITEM.id,
+        source="reddit",
+        title="Click here\x1b[2J\x1b]8;;https://evil.example\x07spoofed link\x1b]8;;\x07",
+        url="https://reddit.com/r/test/comments/abc\x1b[31mFAKE",
+        timestamp=LIVE_ITEM.timestamp,
+        status="live",
+    )
+    line = format_feed_item_human(malicious_item, now)
+    assert not re.search("[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", line)
+    assert "Click here" in line
+    assert "spoofed link" in line
 
 
 def test_parse_item_id_splits_a_simple_id_on_the_first_colon():
