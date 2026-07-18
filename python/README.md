@@ -4,9 +4,9 @@ A provenance-first OSINT/security intelligence feed. Every item ships a real
 source URL, a real upstream timestamp, and an explicit `live`/`fallback`
 flag -- never a fabricated or silently-replayed data point.
 
-[![PyPI version](https://img.shields.io/pypi/v/truesignal.svg)](https://pypi.org/project/truesignal/)
+[![PyPI version](https://img.shields.io/pypi/v/truesignal-cli.svg)](https://pypi.org/project/truesignal-cli/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/RudrenduPaul/truesignal/blob/main/LICENSE)
-[![Python versions](https://img.shields.io/pypi/pyversions/truesignal.svg)](https://pypi.org/project/truesignal/)
+[![Python versions](https://img.shields.io/pypi/pyversions/truesignal-cli.svg)](https://pypi.org/project/truesignal-cli/)
 [![CI](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml)
 
 ## Why this exists
@@ -23,13 +23,13 @@ Node binary.
 ## Install
 
 ```bash
-pip install truesignal
+pip install truesignal-cli
 ```
 
 or with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv add truesignal
+uv add truesignal-cli
 ```
 
 No separate install step, no external binary to fetch. The complementary
@@ -142,3 +142,4 @@ pytest
 ## License
 
 MIT, see [LICENSE](https://github.com/RudrenduPaul/truesignal/blob/main/LICENSE).
+
