@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "truesignal"
-version = "0.1.0"
+version = "0.1.1"
 description = "Provenance-first OSINT/security intelligence feed CLI. Every item ships a real source URL, a real timestamp, and an explicit live/fallback flag -- never a fabricated or silently-replayed data point."
 readme = "README.md"
 requires-python = ">=3.9"

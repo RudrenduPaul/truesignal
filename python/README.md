@@ -1,3 +1,10 @@
+# truesignal (Python) -- renamed to truesignal-cli
+
+**This PyPI package has been renamed.** Install [`truesignal-cli`](https://pypi.org/project/truesignal-cli/)
+instead: `pip install truesignal-cli`. This package will not receive further updates.
+
+---
+
 # truesignal (Python)
 
 A provenance-first OSINT/security intelligence feed. Every item ships a real
