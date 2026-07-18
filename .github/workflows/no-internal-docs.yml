@@ -16,7 +16,7 @@ jobs:
       - name: Forbidden filenames
         run: |
           hits=$(find . -type f \( \
-            -iname '***' -o \
+            -iname 'CLAUDE.md' -o \
             -iname 'TODOS.md' -o \
             -iname 'BRANCH_PROTECTION.md' \
           \) -not -path './node_modules/*')
@@ -29,10 +29,10 @@ jobs:
 
       - name: Internal-process language in tracked files
         run: |
-          pattern='***|office.?hours|eng.?review|***|*** review|*** threat.?model|/oss-[0-9]+-[a-z-]+|/plan-***|***|***|***|fundrais|investor.?outreach|WTP test|Assumption [0-9]|execution.?plan|falsification condition'
+          pattern='CEO review|office.?hours|eng.?review|devex.?review|CSO review|CSO threat.?model|/oss-[0-9]+-[a-z-]+|/plan-eng-review|/review finding|Reviewer Concern|fundrais|investor.?outreach|WTP test|Assumption [0-9]|execution.?plan|falsification condition'
           hits=$(grep -rniE "$pattern" \
             --include='*.md' --include='*.ts' --include='*.tsx' --include='*.js' \
-            --include='*.yml' --include='*.yaml' --include='*.json' \
+            --include='*.py' --include='*.yml' --include='*.yaml' --include='*.json' \
             --exclude-dir=node_modules --exclude-dir=.git \
             --exclude='no-internal-docs.yml' .) || true
           if [ -n "$hits" ]; then

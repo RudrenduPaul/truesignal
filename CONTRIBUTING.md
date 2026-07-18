@@ -120,7 +120,7 @@ tools already enforce.
 
 ## A note on internal docs
 
-This repo never carries a `***`, `TODOS.md`, or `BRANCH_PROTECTION.md` at its root, and
+This repo never carries a `CLAUDE.md`, `TODOS.md`, or `BRANCH_PROTECTION.md` at its root, and
 never references an internal build/review process in code comments or commit messages. CI
 enforces this (`.github/workflows/no-internal-docs.yml`). If you're restoring from an older
 local branch or fork, don't reintroduce any of those files.

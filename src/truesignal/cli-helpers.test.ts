@@ -151,6 +151,21 @@ describe('formatFeedItemHuman', () => {
     expect(line).toContain('[fallback,');
     expect(line).toContain('1h old');
   });
+
+  it('strips control characters from attacker-controlled title and url before printing', () => {
+    const now = new Date('2026-07-01T00:05:00.000Z');
+    const maliciousItem: FeedItem = {
+      ...liveItem,
+      source: 'reddit',
+      title: 'Click here\x1b[2J\x1b]8;;https://evil.example\x07spoofed link\x1b]8;;\x07',
+      url: 'https://reddit.com/r/test/comments/abc\x1b[31mFAKE',
+    };
+    const line = formatFeedItemHuman(maliciousItem, now);
+    // eslint-disable-next-line no-control-regex -- asserting control chars are ABSENT
+    expect(line).not.toMatch(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/);
+    expect(line).toContain('Click here');
+    expect(line).toContain('spoofed link');
+  });
 });
 
 describe('parseItemId', () => {
