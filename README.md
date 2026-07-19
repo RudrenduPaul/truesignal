@@ -6,10 +6,10 @@ invented data point.
 
 [![CI](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![PyPI version](https://img.shields.io/pypi/v/truesignal.svg)](https://pypi.org/project/truesignal/)
-<!-- TODO: add an npm version badge once truesignal-cli is published to the npm registry -->
+[![npm version](https://img.shields.io/npm/v/truesignal-cli.svg)](https://www.npmjs.com/package/truesignal-cli)
+[![PyPI version](https://img.shields.io/pypi/v/truesignal-cli.svg)](https://pypi.org/project/truesignal-cli/)
 
-<!-- TODO: record a real demo GIF -->
+![truesignal init and truesignal feed --source cisa-kev, run via npx truesignal-cli, showing connector status then a live CISA-KEV feed with real CVE ids and source URLs](./docs/demo.gif)
 
 ```
 $ truesignal init
@@ -45,12 +45,16 @@ toolchain, or install both:
 **npm (JS/TS CLI):**
 
 ```bash
+npx truesignal-cli init
+```
+
+`truesignal-cli` is published on npm (see the badge above). To build from source instead:
+
+```bash
 git clone https://github.com/RudrenduPaul/truesignal.git && cd truesignal && npm install && npm run build && node dist/cli.js init
 ```
 
-<!-- TODO: truesignal-cli is not yet published to npm. Once it is, this becomes: npx truesignal-cli init -->
-
-Requires Node.js 18.17 or later. Verified working from a clean scratch clone on 2026-07-15.
+Requires Node.js 18.17 or later. Both install paths verified working on 2026-07-18.
 
 For repeat use, `npm link` after building gives you the `truesignal` command directly instead of
 typing `node dist/cli.js`.
@@ -198,6 +202,8 @@ fetch failed with no data to show.
 
 ### `truesignal verify <item-id> [--json]`
 
+![truesignal verify cisa-kev:CVE-2023-4346 confirming live provenance, followed by truesignal feed --source cisa-kev --json printing the stable FeedItem[] JSON schema, run via npx truesignal-cli](./docs/usage.gif)
+
 Re-fetches the source named in `<item-id>` (format `<source>:<native-id>`, e.g.
 `cisa-kev:CVE-2023-4346`) and confirms whether that item still resolves to real, live
 provenance, has fallen back to cached data, or can no longer be found. Real capture:
@@ -307,6 +313,27 @@ Node binary), kept in behavioral parity. Field names follow each language's own 
 (`fallbackAgeSeconds` in TypeScript, `fallback_age_seconds` in Python); everything else about the
 data and CLI surface is the same. See [python/README.md](./python/README.md) for the
 Python-specific docs.
+
+**What is TrueSignal, in one line, and what's the actual differentiator?**
+Per its own `--help` output: "a provenance-first OSINT/security intelligence feed" that pulls
+from five official-API connectors (CISA-KEV, Cloudflare Radar, Reddit, Telegram, GDELT) and
+stamps every item with a real source URL, a real upstream timestamp, and an explicit `live` or
+`fallback` status. The differentiator isn't the connector list, it's the no-fabrication
+guarantee: `src/truesignal/provenance/no-fabrication.test.ts` and its Python equivalent
+(`python/tests/test_no_fabrication.py`) run on every push and pull request to `main`
+(`.github/workflows/ci.yml`), asserting that no connector's failure path ever invents data.
+
+**What platforms and versions does TrueSignal run on?**
+The npm package requires Node.js 18.17 or later (`engines.node` in `package.json`). The Python
+package supports Python 3.9 through 3.13 (`pyproject.toml` classifiers), and CI runs the Python
+test suite against both 3.9 and 3.13 on every push and pull request. Both CI jobs currently run
+on `ubuntu-latest`; Node.js and Python are cross-platform runtimes, but macOS and Windows aren't
+separately exercised by this repo's CI today.
+
+**Can I use TrueSignal commercially?**
+Yes. It's MIT-licensed (see [LICENSE](./LICENSE)): free to use, modify, and redistribute,
+including in commercial products, with no royalty and no separate commercial tier, subject to
+keeping the copyright notice. There's no paid version and no account requirement.
 
 ## Security
 

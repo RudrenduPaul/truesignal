@@ -1,6 +1,6 @@
 {
   "name": "truesignal-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A provenance-first OSINT/security intelligence feed CLI. Every item ships a real source URL, a real timestamp, and an explicit live/fallback flag -- never a fabricated or silently-replayed data point.",
   "keywords": [
     "osint",
