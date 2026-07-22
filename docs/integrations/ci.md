@@ -56,8 +56,6 @@ jobs:
           path: cisa-kev.json
 ```
 
-<!-- TODO: truesignal-cli is not yet published to npm; the npx invocation above will work once it is. -->
-
 ## Gating on a specific item still being live
 
 `truesignal verify <item-id>` exits `0` when the item resolves to real,
