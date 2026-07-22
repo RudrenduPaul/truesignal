@@ -13,10 +13,14 @@ install both.
 **npm (JS/TS CLI):**
 
 ```bash
-git clone https://github.com/RudrenduPaul/truesignal.git && cd truesignal && npm install && npm run build && node dist/cli.js init
+npx truesignal-cli init
 ```
 
-<!-- TODO: truesignal-cli is not yet published to npm. Once it is, this becomes: npx truesignal-cli init -->
+`truesignal-cli` is published on npm. To build from source instead:
+
+```bash
+git clone https://github.com/RudrenduPaul/truesignal.git && cd truesignal && npm install && npm run build && node dist/cli.js init
+```
 
 **pip (Python library + CLI):**
 

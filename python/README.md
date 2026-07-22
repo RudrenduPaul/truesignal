@@ -127,6 +127,38 @@ Sigstore signatures, or an SBOM, and has no OpenSSF Scorecard badge set up
 -- none of that infrastructure exists yet for either distribution, so it
 isn't claimed here.
 
+## FAQ
+
+**What does this do?**
+Pulls OSINT and security-relevant items (CVEs, threat intel, security news) from five official
+APIs -- CISA-KEV, Cloudflare Radar, Reddit, Telegram, GDELT -- and stamps every item with a real
+source URL, a real upstream timestamp, and an explicit `live`/`fallback` label, so you never see
+fabricated or silently-stale data presented as current.
+
+**How is this PyPI package different from the npm one, if at all?**
+It isn't a wrapper around the Node binary -- it's a genuine, independent Python port with the same
+five connectors, the same `fetch_with_fallback` provenance guarantee, and the same `init`/`feed`/
+`verify` CLI surface. Both distributions are first-class and maintained together; neither is
+deprecated in favor of the other, so pick whichever fits your toolchain.
+
+**Does this need an API key?**
+Not to start. CISA-KEV and GDELT work with zero configuration. Cloudflare Radar, Reddit, and
+Telegram each need a free developer key or token, read only from environment variables
+(`CLOUDFLARE_RADAR_API_TOKEN`, `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `TELEGRAM_BOT_TOKEN`) --
+`truesignal init` tells you exactly which ones are still missing.
+
+**Is it safe to run?**
+No connector `eval()`s, `exec()`s, or dynamically imports anything read from an upstream response
+-- responses are only ever parsed as JSON and mapped into typed fields. Credentials are never
+accepted as a CLI flag and never auto-loaded from a `.env` file. See the Security section above
+for the current caveat on SLSA/Sigstore/SBOM/Scorecard coverage.
+
+**What happens if a source goes down?**
+The connector returns real cached data explicitly labeled `fallback` (with its exact real age in
+`fallback_age_seconds`), or nothing at all -- never invented data, and never old data silently
+relabeled as current. That guarantee is enforced by `tests/test_no_fabrication.py` for every one
+of the 5 connectors.
+
 ## Contributing
 
 See [CONTRIBUTING.md](https://github.com/RudrenduPaul/truesignal/blob/main/CONTRIBUTING.md)
