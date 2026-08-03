@@ -25,7 +25,7 @@ git clone https://github.com/RudrenduPaul/truesignal.git && cd truesignal && npm
 **pip (Python library + CLI):**
 
 ```bash
-pip install truesignal
+pip install truesignal-cli
 ```
 
 Neither install pulls anything beyond the connector's own upstream API call

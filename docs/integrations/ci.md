@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install truesignal
+      - run: pip install truesignal-cli
       - name: Pull today's CISA-KEV feed
         run: truesignal feed --source cisa-kev --json > cisa-kev.json
       - uses: actions/upload-artifact@v4
@@ -66,7 +66,7 @@ step can gate a job on that directly:
 ```yaml
 - name: Confirm a specific CVE is still tracked live
   run: |
-    pip install truesignal
+    pip install truesignal-cli
     truesignal verify cisa-kev:CVE-2026-12345
 ```
 
