@@ -62,7 +62,7 @@ typing `node dist/cli.js`.
 **pip (Python library + CLI):**
 
 ```bash
-pip install truesignal
+pip install truesignal-cli
 ```
 
 A genuine, independent Python port -- not a wrapper around the Node binary -- with the same five
