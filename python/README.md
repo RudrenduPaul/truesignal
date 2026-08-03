@@ -174,4 +174,3 @@ pytest
 ## License
 
 MIT, see [LICENSE](https://github.com/RudrenduPaul/truesignal/blob/main/LICENSE).
-
