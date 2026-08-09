@@ -5,6 +5,7 @@ source URL, a real upstream timestamp, and an explicit `live`/`fallback`
 flag -- never a fabricated or silently-replayed data point.
 
 [![PyPI version](https://img.shields.io/pypi/v/truesignal-cli.svg)](https://pypi.org/project/truesignal-cli/)
+[![npm version](https://img.shields.io/npm/v/truesignal-cli.svg)](https://www.npmjs.com/package/truesignal-cli)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/RudrenduPaul/truesignal/blob/main/LICENSE)
 [![Python versions](https://img.shields.io/pypi/pyversions/truesignal-cli.svg)](https://pypi.org/project/truesignal-cli/)
 [![CI](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml)
