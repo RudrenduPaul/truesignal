@@ -13,7 +13,7 @@ authors = [
   { name = "Rudrendu Paul" },
   { name = "Sourav Nandy" },
 ]
-keywords = ["osint", "security", "threat-intelligence", "cisa-kev", "cve", "cli", "provenance", "cloudflare-radar", "gdelt"]
+keywords = ["osint", "security", "threat-intelligence", "cisa-kev", "cve", "cli", "provenance", "cloudflare-radar", "gdelt", "reddit", "telegram"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",

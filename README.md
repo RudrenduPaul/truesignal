@@ -1,41 +1,24 @@
 # TrueSignal
 
-A personal OSINT/security intelligence feed with a no-fabrication guarantee verified by 22
-automated tests: every connector's failure path returns real cached data or nothing, never an
-invented data point.
-
 [![CI](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![npm version](https://img.shields.io/npm/v/truesignal-cli.svg)](https://www.npmjs.com/package/truesignal-cli)
 [![PyPI version](https://img.shields.io/pypi/v/truesignal-cli.svg)](https://pypi.org/project/truesignal-cli/)
 
+<p align="center">
+<a href="#install">Install</a> •
+<a href="#quickstart">Quickstart</a> •
+<a href="#features">Features</a> •
+<a href="#cli-command-reference">CLI Reference</a> •
+<a href="#how-truesignal-compares">Compare</a> •
+<a href="#faq">FAQ</a>
+</p>
+
+A personal OSINT/security intelligence feed with a no-fabrication guarantee verified by 22
+automated tests: every connector's failure path returns real cached data or nothing, never an
+invented data point.
+
 ![truesignal init and truesignal feed --source cisa-kev, run via npx truesignal-cli, showing connector status then a live CISA-KEV feed with real CVE ids and source URLs](./docs/demo.gif)
-
-```
-$ truesignal init
-
-truesignal connector status:
-
-  [ready]        CISA Known Exploited Vulnerabilities (cisa-kev) -- no configuration needed
-  [not configured] Cloudflare Radar (cloudflare-radar) -- set CLOUDFLARE_RADAR_API_TOKEN
-  [not configured] Reddit (reddit) -- set REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET
-  [not configured] Telegram (telegram) -- set TELEGRAM_BOT_TOKEN
-  [ready]        GDELT (gdelt) -- no configuration needed
-
-2/5 connectors ready.
-Set the missing environment variables above to enable the rest. See .env.example.
-Next: run "truesignal feed" to see your feed now.
-
-$ truesignal feed --source cisa-kev
-
-[live] cisa-kev: CVE-2023-4346: KNX Association KNX Protocol Connection Authorization Option 1 Overly Restrictive Account Lockout Mechanism Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2023-4346 -- 1d ago
-[live] cisa-kev: CVE-2026-46817: Oracle E-Business Suite Improper Privilege Management Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-46817 -- 1d ago
-[live] cisa-kev: CVE-2026-15410: SonicWall SMA1000 Appliances Code Injection Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-15410 -- 2d ago
-```
-
-This is a real, unedited capture (`npm run build && node dist/cli.js init && node dist/cli.js
-feed --source cisa-kev`), against the live CISA-KEV catalog, on 2026-07-15. CVE ids, urls, and
-ages are real.
 
 ## Install
 
@@ -70,16 +53,31 @@ connectors, the same provenance-stamping guarantee, and the same `init`/`feed`/`
 surface. See [python/README.md](./python/README.md) for the Python-specific quickstart. Both
 packages are maintained together; neither is deprecated in favor of the other.
 
-## Table of contents
+```
+$ truesignal init
 
-- [Features](#features)
-- [Quickstart](#quickstart)
-- [CLI command reference](#cli-command-reference)
-- [How TrueSignal compares](#how-truesignal-compares)
-- [What is TrueSignal, and why does it exist](#what-is-truesignal-and-why-does-it-exist)
-- [FAQ](#faq)
-- [Contributing](#contributing)
-- [License](#license)
+truesignal connector status:
+
+  [ready]        CISA Known Exploited Vulnerabilities (cisa-kev) -- no configuration needed
+  [not configured] Cloudflare Radar (cloudflare-radar) -- set CLOUDFLARE_RADAR_API_TOKEN
+  [not configured] Reddit (reddit) -- set REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET
+  [not configured] Telegram (telegram) -- set TELEGRAM_BOT_TOKEN
+  [ready]        GDELT (gdelt) -- no configuration needed
+
+2/5 connectors ready.
+Set the missing environment variables above to enable the rest. See .env.example.
+Next: run "truesignal feed" to see your feed now.
+
+$ truesignal feed --source cisa-kev
+
+[live] cisa-kev: CVE-2023-4346: KNX Association KNX Protocol Connection Authorization Option 1 Overly Restrictive Account Lockout Mechanism Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2023-4346 -- 1d ago
+[live] cisa-kev: CVE-2026-46817: Oracle E-Business Suite Improper Privilege Management Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-46817 -- 1d ago
+[live] cisa-kev: CVE-2026-15410: SonicWall SMA1000 Appliances Code Injection Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-15410 -- 2d ago
+```
+
+This is a real, unedited capture (`npm run build && node dist/cli.js init && node dist/cli.js
+feed --source cisa-kev`), against the live CISA-KEV catalog, on 2026-07-15. CVE ids, urls, and
+ages are real.
 
 ## Features
 
