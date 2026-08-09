@@ -4,6 +4,16 @@ All notable changes to this project are documented in this file. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.4] / [Python 0.1.3] - 2026-08-08
+
+### Fixed
+
+- `truesignal --version` reported a hardcoded `0.1.0` string on every release since the initial
+  publish, regardless of the version actually installed (confirmed on the live npm 0.1.3 and
+  PyPI 0.1.2 packages via a real global install). Both distributions now read their version at
+  runtime -- npm from `package.json`, PyPI from `importlib.metadata` -- instead of duplicating it
+  as a stale string literal in `cli.ts` / `cli.py`.
+
 ## [Python 0.1.0] - 2026-07-16
 
 ### Added
