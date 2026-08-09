@@ -170,6 +170,8 @@ Commands:
 
 ### `truesignal init [--json]`
 
+![truesignal init --json printing structured connector-readiness output](./docs/demo-init-json.gif)
+
 Exit code `0` if at least one connector is usable, `2` if none are (shouldn't happen -- CISA-KEV
 and GDELT need no configuration).
 
