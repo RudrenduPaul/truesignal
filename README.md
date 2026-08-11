@@ -1,3 +1,4 @@
+<!-- mcp-name: io.github.RudrenduPaul/truesignal -->
 # TrueSignal
 
 [![CI](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml)
@@ -10,6 +11,7 @@
 <a href="#quickstart">Quickstart</a> •
 <a href="#features">Features</a> •
 <a href="#cli-command-reference">CLI Reference</a> •
+<a href="#mcp-server">MCP Server</a> •
 <a href="#how-truesignal-compares">Compare</a> •
 <a href="#faq">FAQ</a>
 </p>
@@ -216,6 +218,37 @@ cisa-kev:CVE-2023-4346: LIVE -- https://nvd.nist.gov/vuln/detail/CVE-2023-4346 -
 Exit codes: `0` found and live/fallback, `1` re-fetched successfully but the item is gone, `2` the
 connector isn't configured, `3` the re-fetch failed, `4` the item id is malformed or names an
 unknown source.
+
+## MCP Server
+
+TrueSignal ships a Model Context Protocol (MCP) server, so an MCP-compatible agent runtime
+(Claude Desktop, Claude Code, or any other MCP client) can call TrueSignal directly instead of
+shelling out to the CLI and parsing text.
+
+```bash
+pip install "truesignal-cli[mcp]"
+```
+
+Add it to your Claude Desktop config (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "truesignal": {
+      "command": "truesignal-mcp"
+    }
+  }
+}
+```
+
+The server exposes a single tool, `run(args: list[str])`, that shells out to the installed
+`truesignal` CLI with the given arguments and returns its parsed JSON output -- for example,
+`run(args=["feed", "--source", "cisa-kev", "--json"])` returns the parsed `FeedItem[]` JSON for
+the CISA-KEV connector's current feed, the same data `truesignal feed --source cisa-kev --json`
+prints on the command line. Every failure mode (missing CLI, timeout, non-zero exit, unparseable
+output) is caught and returned as `{"error": ...}` instead of raising. See
+[python/src/truesignal/mcp_server.py](./python/src/truesignal/mcp_server.py) for the
+implementation.
 
 ## How TrueSignal compares
 
