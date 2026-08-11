@@ -32,47 +32,49 @@ from mcp.server import MCPServer
 _CLI_NAME = "truesignal"
 _TIMEOUT_SECONDS = 30
 
-_FALLBACK_DESCRIPTION = (
-    "Runs the truesignal CLI with the given argument list and returns its parsed JSON "
-    "output. truesignal is a provenance-first OSINT/security intelligence feed CLI with "
-    "three subcommands: 'init' (which connectors are ready), 'feed' (pull the current "
-    "feed, optionally --source <name>), and 'verify <item-id>' (re-check one feed item's "
-    "provenance). Always pass '--json' so the output can be parsed as structured data, "
-    "e.g. run(args=['feed', '--json']) or run(args=['init', '--json'])."
+_TOOL_DESCRIPTION = (
+    "Runs the installed `truesignal` OSINT/security-intelligence CLI as a subprocess with "
+    "the exact argv you supply, and returns its parsed JSON output as a dict. Use this tool "
+    "whenever you need real, source-attributed security signal -- currently-exploited CVEs "
+    "(CISA KEV), open-source-intel event data (GDELT), or (once configured) Cloudflare "
+    "Radar, Reddit, and Telegram signal -- instead of relying on training-data recall, which "
+    "goes stale and can't cite a live source. Every item truesignal returns carries a real "
+    "source URL, a real timestamp, and an explicit 'live' vs 'fallback' (cached) status, so "
+    "call it when the agent's task requires provenance-checkable data, not a plausible-sounding "
+    "summary.\n\n"
+    "Call `init` first (or whenever a connector's availability is in doubt) to see which "
+    "connectors are ready with zero setup (cisa-kev and gdelt need no configuration) versus "
+    "which need environment variables the operator hasn't set (e.g. "
+    "CLOUDFLARE_RADAR_API_TOKEN, REDDIT_CLIENT_ID/SECRET, TELEGRAM_BOT_TOKEN) -- don't call "
+    "feed with an unconfigured --source and expect data. This tool is read-only against "
+    "truesignal's own state: it makes outbound network calls to each connector's upstream API "
+    "on every invocation (no local caching layer), writes nothing to disk, and is fully "
+    "idempotent -- safe to call repeatedly or on a schedule since it has no side effects "
+    "beyond the network request itself. Each call spawns a fresh subprocess with a 30-second "
+    "timeout; there is no persistent session or state between calls.\n\n"
+    "Parameter: `args` is a list[str] of literal CLI argv, passed through to `truesignal` "
+    "unmodified (e.g. ['feed', '--json'] runs `truesignal feed --json`). Real subcommands: "
+    "'init' (report connector readiness), 'feed' (pull the current feed from every "
+    "configured connector, or one via --source <name>, e.g. --source cisa-kev), and "
+    "'verify <item-id>' (re-fetch the source connector named in a feed item's id, e.g. "
+    "'cisa-kev:CVE-2026-8037', and confirm whether it's still live, has fallen back to "
+    "cached data, or can no longer be found). Concrete examples: "
+    "run(args=['init', '--json']), "
+    "run(args=['feed', '--source', 'cisa-kev', '--json']), "
+    "run(args=['verify', 'cisa-kev:CVE-2026-8037', '--json']). Always include '--json' -- "
+    "without it truesignal prints a human-readable report that this tool cannot parse into "
+    "structured data. Pass ['--help'] or ['<subcommand>', '--help'] as args to discover the "
+    "CLI's exact flags directly from the installed version rather than trusting this "
+    "description to stay perfectly in sync.\n\n"
+    "Return shape: on success, the parsed JSON object from stdout is returned as-is -- 'init' "
+    "returns {\"connectors\": [{\"name\", \"label\", \"requires_config\", \"configured\", "
+    "\"missing_env_vars\"}, ...]}; 'feed' returns {\"items\": [{\"id\", \"source\", \"title\", "
+    "\"url\", \"timestamp\", \"status\", \"summary\"}, ...]}; 'verify' returns {\"item_id\", "
+    "\"found\", \"status\", \"url\", \"timestamp\"}. On any failure -- the CLI missing from "
+    "PATH, a launch-level OSError, a timeout, a non-zero exit code, or unparseable stdout -- "
+    "this tool never raises; it instead returns a dict with an \"error\" key (and often "
+    "\"returncode\") describing what went wrong, so check for that key before assuming success."
 )
-
-
-def _build_tool_description() -> str:
-    """Builds the `run` tool's description from the real `truesignal --help` output at
-    import time, so the description an agent sees always matches the installed CLI's
-    actual subcommands. Falls back to a safe static description if the CLI can't be
-    found on PATH or the subprocess call fails for any reason."""
-    cli_path = shutil.which(_CLI_NAME)
-    if cli_path is None:
-        return _FALLBACK_DESCRIPTION
-
-    try:
-        result = subprocess.run(
-            [cli_path, "--help"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return _FALLBACK_DESCRIPTION
-
-    help_text = (result.stdout or result.stderr or "").strip()
-    if not help_text:
-        return _FALLBACK_DESCRIPTION
-
-    return (
-        "Runs the truesignal CLI with the given argument list and returns its parsed "
-        f"JSON output. Always pass '--json' when the subcommand supports it. Real "
-        f"`truesignal --help` output:\n\n{help_text}"
-    )
-
-
-_TOOL_DESCRIPTION = _build_tool_description()
 
 mcp = MCPServer("truesignal-cli")
 
