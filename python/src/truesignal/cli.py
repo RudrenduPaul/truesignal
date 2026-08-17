@@ -15,6 +15,7 @@ import json
 import sys
 from typing import List, Optional
 
+from . import __version__ as _VERSION
 from .cli_helpers import (
     ExitCode,
     format_feed_item_human,
@@ -24,8 +25,6 @@ from .cli_helpers import (
     run_verify,
 )
 from .connectors import ALL_CONNECTORS
-
-_VERSION = "0.1.0"
 
 
 def build_parser() -> argparse.ArgumentParser:

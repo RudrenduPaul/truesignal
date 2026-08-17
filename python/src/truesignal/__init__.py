@@ -13,6 +13,9 @@ connectors (CISA-KEV, Cloudflare Radar, Reddit, Telegram, GDELT) and the same no
 provenance guarantee; see https://github.com/RudrenduPaul/truesignal for the canonical
 documentation and the original TypeScript source.
 """
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
+
 from .connectors import ALL_CONNECTORS, get_connector
 from .provenance import (
     fetch_with_fallback,
@@ -24,7 +27,13 @@ from .provenance import (
 )
 from .types import Connector, ConnectorNotConfiguredError, FeedItem, ItemStatus, UnstampedItem
 
-__version__ = "0.1.0"
+try:
+    # Single source of truth: the version pip/PyPI actually installed, not a string literal that
+    # has to be remembered on every release (it wasn't -- this stayed "0.1.0" through 0.1.1 and
+    # 0.1.2 while pyproject.toml moved on).
+    __version__ = _pkg_version("truesignal-cli")
+except PackageNotFoundError:  # pragma: no cover - only hit running from source, uninstalled
+    __version__ = "0.0.0+unknown"
 
 __all__ = [
     "Connector",

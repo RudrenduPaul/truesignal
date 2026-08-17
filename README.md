@@ -1,41 +1,27 @@
-# TrueSignal
+<!-- mcp-name: io.github.RudrenduPaul/truesignal -->
 
-A personal OSINT/security intelligence feed with a no-fabrication guarantee verified by 22
-automated tests: every connector's failure path returns real cached data or nothing, never an
-invented data point.
+# TrueSignal
 
 [![CI](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml/badge.svg)](https://github.com/RudrenduPaul/truesignal/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![npm version](https://img.shields.io/npm/v/truesignal-cli.svg)](https://www.npmjs.com/package/truesignal-cli)
 [![PyPI version](https://img.shields.io/pypi/v/truesignal-cli.svg)](https://pypi.org/project/truesignal-cli/)
 
+<p align="center">
+<a href="#install">Install</a> •
+<a href="#quickstart">Quickstart</a> •
+<a href="#features">Features</a> •
+<a href="#cli-command-reference">CLI Reference</a> •
+<a href="#mcp-server">MCP Server</a> •
+<a href="#how-truesignal-compares">Compare</a> •
+<a href="#faq">FAQ</a>
+</p>
+
+A personal OSINT/security intelligence feed with a no-fabrication guarantee verified by 22
+automated tests: every connector's failure path returns real cached data or nothing, never an
+invented data point.
+
 ![truesignal init and truesignal feed --source cisa-kev, run via npx truesignal-cli, showing connector status then a live CISA-KEV feed with real CVE ids and source URLs](./docs/demo.gif)
-
-```
-$ truesignal init
-
-truesignal connector status:
-
-  [ready]        CISA Known Exploited Vulnerabilities (cisa-kev) -- no configuration needed
-  [not configured] Cloudflare Radar (cloudflare-radar) -- set CLOUDFLARE_RADAR_API_TOKEN
-  [not configured] Reddit (reddit) -- set REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET
-  [not configured] Telegram (telegram) -- set TELEGRAM_BOT_TOKEN
-  [ready]        GDELT (gdelt) -- no configuration needed
-
-2/5 connectors ready.
-Set the missing environment variables above to enable the rest. See .env.example.
-Next: run "truesignal feed" to see your feed now.
-
-$ truesignal feed --source cisa-kev
-
-[live] cisa-kev: CVE-2023-4346: KNX Association KNX Protocol Connection Authorization Option 1 Overly Restrictive Account Lockout Mechanism Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2023-4346 -- 1d ago
-[live] cisa-kev: CVE-2026-46817: Oracle E-Business Suite Improper Privilege Management Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-46817 -- 1d ago
-[live] cisa-kev: CVE-2026-15410: SonicWall SMA1000 Appliances Code Injection Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-15410 -- 2d ago
-```
-
-This is a real, unedited capture (`npm run build && node dist/cli.js init && node dist/cli.js
-feed --source cisa-kev`), against the live CISA-KEV catalog, on 2026-07-15. CVE ids, urls, and
-ages are real.
 
 ## Install
 
@@ -70,16 +56,31 @@ connectors, the same provenance-stamping guarantee, and the same `init`/`feed`/`
 surface. See [python/README.md](./python/README.md) for the Python-specific quickstart. Both
 packages are maintained together; neither is deprecated in favor of the other.
 
-## Table of contents
+```
+$ truesignal init
 
-- [Features](#features)
-- [Quickstart](#quickstart)
-- [CLI command reference](#cli-command-reference)
-- [How TrueSignal compares](#how-truesignal-compares)
-- [What is TrueSignal, and why does it exist](#what-is-truesignal-and-why-does-it-exist)
-- [FAQ](#faq)
-- [Contributing](#contributing)
-- [License](#license)
+truesignal connector status:
+
+  [ready]        CISA Known Exploited Vulnerabilities (cisa-kev) -- no configuration needed
+  [not configured] Cloudflare Radar (cloudflare-radar) -- set CLOUDFLARE_RADAR_API_TOKEN
+  [not configured] Reddit (reddit) -- set REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET
+  [not configured] Telegram (telegram) -- set TELEGRAM_BOT_TOKEN
+  [ready]        GDELT (gdelt) -- no configuration needed
+
+2/5 connectors ready.
+Set the missing environment variables above to enable the rest. See .env.example.
+Next: run "truesignal feed" to see your feed now.
+
+$ truesignal feed --source cisa-kev
+
+[live] cisa-kev: CVE-2023-4346: KNX Association KNX Protocol Connection Authorization Option 1 Overly Restrictive Account Lockout Mechanism Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2023-4346 -- 1d ago
+[live] cisa-kev: CVE-2026-46817: Oracle E-Business Suite Improper Privilege Management Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-46817 -- 1d ago
+[live] cisa-kev: CVE-2026-15410: SonicWall SMA1000 Appliances Code Injection Vulnerability -- https://nvd.nist.gov/vuln/detail/CVE-2026-15410 -- 2d ago
+```
+
+This is a real, unedited capture (`npm run build && node dist/cli.js init && node dist/cli.js
+feed --source cisa-kev`), against the live CISA-KEV catalog, on 2026-07-15. CVE ids, urls, and
+ages are real.
 
 ## Features
 
@@ -170,6 +171,8 @@ Commands:
 
 ### `truesignal init [--json]`
 
+![truesignal init --json printing structured connector-readiness output](./docs/demo-init-json.gif)
+
 Exit code `0` if at least one connector is usable, `2` if none are (shouldn't happen -- CISA-KEV
 and GDELT need no configuration).
 
@@ -217,6 +220,37 @@ Exit codes: `0` found and live/fallback, `1` re-fetched successfully but the ite
 connector isn't configured, `3` the re-fetch failed, `4` the item id is malformed or names an
 unknown source.
 
+## MCP Server
+
+TrueSignal ships a Model Context Protocol (MCP) server, so an MCP-compatible agent runtime
+(Claude Desktop, Claude Code, or any other MCP client) can call TrueSignal directly instead of
+shelling out to the CLI and parsing text.
+
+```bash
+pip install "truesignal-cli[mcp]"
+```
+
+Add it to your Claude Desktop config (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "truesignal": {
+      "command": "truesignal-mcp"
+    }
+  }
+}
+```
+
+The server exposes a single tool, `run(args: list[str])`, that shells out to the installed
+`truesignal` CLI with the given arguments and returns its parsed JSON output -- for example,
+`run(args=["feed", "--source", "cisa-kev", "--json"])` returns the parsed `FeedItem[]` JSON for
+the CISA-KEV connector's current feed, the same data `truesignal feed --source cisa-kev --json`
+prints on the command line. Every failure mode (missing CLI, timeout, non-zero exit, unparseable
+output) is caught and returned as `{"error": ...}` instead of raising. See
+[python/src/truesignal/mcp_server.py](./python/src/truesignal/mcp_server.py) for the
+implementation.
+
 ## How TrueSignal compares
 
 Every cell below is a cited, checkable fact, current as of 2026-08-03, drawn only from tools
@@ -224,14 +258,14 @@ actually run in this pass. See [`benchmarks/`](./benchmarks/) for the reproducti
 behind every TrueSignal number.
 
 |                                         | **TrueSignal**                                                                                     | [Crucix](https://github.com/calesthio/Crucix)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | [SpiderFoot](https://github.com/smicallef/spiderfoot) | [IntelOwl](https://github.com/intelowlproject/IntelOwl)     |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
 | Category                                | Narrow personal OSINT/security feed                                                                | Broad personal intelligence dashboard (markets, air traffic, social, news, security)                                                                                                                                                                                                                                                                                                                                                                                                                                               | General-purpose OSINT recon automation, 200+ modules  | Threat-intel analyzer aggregation at scale, 150+ analyzers  |
-| No-fabrication test suite               | **22/22 passing**, CI-enforced (`npx vitest run src/truesignal/provenance/no-fabrication.test.ts`) | No such suite found                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | No such suite found                                   | No such suite found                                          |
-| Documented fabrication/staleness issues | 0                                                                                                  | **5 open, unfixed**, as of 2026-08-03: [#112](https://github.com/calesthio/Crucix/issues/112) (`Math.random()` map coordinates), [#113](https://github.com/calesthio/Crucix/issues/113) (stale air-traffic data replayed as current), [#115](https://github.com/calesthio/Crucix/issues/115) (rewritten article timestamps), [#110](https://github.com/calesthio/Crucix/issues/110) (ToS-violating spoofed-UA Telegram scraping), [#108](https://github.com/calesthio/Crucix/issues/108) (unauthenticated Reddit `.json` scraping) | Not applicable -- different problem domain            | Not applicable -- different problem domain                   |
-| Install model                           | Single npm CLI, zero background services                                                           | git clone + npm                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | `pip install`, single Python process                  | Docker Compose stack (Django + PostgreSQL + Elastic)         |
-| License                                 | MIT                                                                                                | AGPL-3.0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | MIT                                                   | AGPL-3.0                                                     |
-| API sources                             | Official APIs only (CISA-KEV, Cloudflare Radar, Reddit OAuth, Telegram Bot API, GDELT)             | Includes unauthenticated scraping (see #110, #108) alongside official sources                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Official APIs and public OSINT sources, 200+ modules  | Official APIs and public threat-intel feeds, 150+ analyzers  |
-| GitHub stars (verified 2026-08-03)      | Pre-launch                                                                                         | 11,138 (forks: 1,762; a dated, still-open [forensic issue](https://github.com/calesthio/Crucix/issues/107) alleges an inorganic burst in this repo's own star/fork history -- worth weighing before treating the count alone as a trust signal)                                                                                                                                                                                                                                                                                    | 20,043                                                | 4,642                                                        |
+| No-fabrication test suite               | **22/22 passing**, CI-enforced (`npx vitest run src/truesignal/provenance/no-fabrication.test.ts`) | No such suite found                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | No such suite found                                   | No such suite found                                         |
+| Documented fabrication/staleness issues | 0                                                                                                  | **5 open, unfixed**, as of 2026-08-03: [#112](https://github.com/calesthio/Crucix/issues/112) (`Math.random()` map coordinates), [#113](https://github.com/calesthio/Crucix/issues/113) (stale air-traffic data replayed as current), [#115](https://github.com/calesthio/Crucix/issues/115) (rewritten article timestamps), [#110](https://github.com/calesthio/Crucix/issues/110) (ToS-violating spoofed-UA Telegram scraping), [#108](https://github.com/calesthio/Crucix/issues/108) (unauthenticated Reddit `.json` scraping) | Not applicable -- different problem domain            | Not applicable -- different problem domain                  |
+| Install model                           | Single npm CLI, zero background services                                                           | git clone + npm                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | `pip install`, single Python process                  | Docker Compose stack (Django + PostgreSQL + Elastic)        |
+| License                                 | MIT                                                                                                | AGPL-3.0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | MIT                                                   | AGPL-3.0                                                    |
+| API sources                             | Official APIs only (CISA-KEV, Cloudflare Radar, Reddit OAuth, Telegram Bot API, GDELT)             | Includes unauthenticated scraping (see #110, #108) alongside official sources                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Official APIs and public OSINT sources, 200+ modules  | Official APIs and public threat-intel feeds, 150+ analyzers |
+| GitHub stars (verified 2026-08-03)      | Pre-launch                                                                                         | 11,138 (forks: 1,762; a dated, still-open [forensic issue](https://github.com/calesthio/Crucix/issues/107) alleges an inorganic burst in this repo's own star/fork history -- worth weighing before treating the count alone as a trust signal)                                                                                                                                                                                                                                                                                    | 20,043                                                | 4,642                                                       |
 
 For a human: if you need broad, multi-domain personal intelligence and can tolerate the
 documented fabrication issues, Crucix covers more ground. If you need 200+ general-purpose OSINT

@@ -4,6 +4,9 @@
  * parsing to the testable logic in cli-helpers.ts and sets process exit codes. See ExitCode in
  * cli-helpers.ts for what each code means.
  */
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { allConnectors } from './connectors/index.js';
 import {
@@ -15,6 +18,28 @@ import {
   runVerify,
 } from './cli-helpers.js';
 
+/**
+ * Reads the version out of package.json instead of hardcoding a string that silently goes stale
+ * on every release. Tries both the built layout (dist/cli.js, one directory below the package
+ * root) and the source layout (src/truesignal/cli.ts, two directories below, used by `npm run
+ * dev`), since this file runs from both locations.
+ */
+function readPackageVersion(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [path.join(here, '../package.json'), path.join(here, '../../package.json')];
+  for (const candidate of candidates) {
+    try {
+      const pkg: unknown = JSON.parse(readFileSync(candidate, 'utf8'));
+      if (pkg && typeof pkg === 'object' && 'version' in pkg) {
+        return String((pkg as { version: unknown }).version);
+      }
+    } catch {
+      // Try the next candidate path.
+    }
+  }
+  return '0.0.0';
+}
+
 const program = new Command();
 
 program
@@ -24,7 +49,7 @@ program
       'URL, a real timestamp, and an explicit live/fallback flag -- never a fabricated or ' +
       'silently-replayed data point.',
   )
-  .version('0.1.0');
+  .version(readPackageVersion());
 
 program
   .command('init')
