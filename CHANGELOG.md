@@ -4,6 +4,10 @@ All notable changes to this project are documented in this file. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses
 [Semantic Versioning](https://semver.org/).
 
+## [npm 0.1.5] - 2026-09-25
+
+- npm 0.1.5: republished through npm Trusted Publishing with provenance, no code changes
+
 ## [0.1.4] / [Python 0.1.3] - 2026-08-08
 
 ### Fixed
