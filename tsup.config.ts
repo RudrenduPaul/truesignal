@@ -7,7 +7,7 @@ export default defineConfig({
   },
   format: ['esm'],
   target: 'node18',
-  dts: true,
+  dts: { compilerOptions: { ignoreDeprecations: '6.0' } },
   clean: true,
   splitting: false,
   sourcemap: true,
