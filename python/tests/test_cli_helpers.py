@@ -1,5 +1,5 @@
 """Port of src/truesignal/cli-helpers.test.ts."""
-import re
+import unicodedata
 from datetime import datetime, timezone
 
 from truesignal.cli_helpers import (
@@ -152,7 +152,7 @@ def test_format_feed_item_human_strips_control_characters_from_attacker_controll
         status="live",
     )
     line = format_feed_item_human(malicious_item, now)
-    assert not re.search("[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", line)
+    assert not any(unicodedata.category(ch) == "Cc" and ch not in "\t\n\r" for ch in line)
     assert "Click here" in line
     assert "spoofed link" in line
 

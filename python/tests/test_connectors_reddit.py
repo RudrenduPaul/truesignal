@@ -1,4 +1,6 @@
 """Port of src/truesignal/connectors/reddit.test.ts."""
+from urllib.parse import urlparse
+
 import pytest
 
 from truesignal.connectors.reddit import REDDIT_DEFAULT_SUBREDDIT, reddit_connector
@@ -56,7 +58,7 @@ def test_uses_the_official_oauth_api_never_unauthenticated_json_scraping(monkeyp
     assert item.id == "reddit:abc123"
     assert item.url == "https://reddit.com/r/netsec/comments/abc123/sample_post/"
     assert item.summary == "r/netsec"
-    assert "oauth.reddit.com" in called_urls[0]
+    assert urlparse(called_urls[0]).hostname == "oauth.reddit.com"
     assert REDDIT_DEFAULT_SUBREDDIT in called_urls[0]
 
 

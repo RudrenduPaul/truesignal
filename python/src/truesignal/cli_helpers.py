@@ -8,7 +8,7 @@ convention) where the TypeScript source uses camelCase.
 from __future__ import annotations
 
 import concurrent.futures
-import re
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import IntEnum
@@ -144,7 +144,7 @@ def _format_duration(seconds: int) -> str:
     return f"{days}d"
 
 
-_CONTROL_CHAR_PATTERN = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+_PRESERVED_WHITESPACE = frozenset("\t\n\r")
 
 
 def _sanitize_for_terminal(text: str) -> str:
@@ -155,7 +155,11 @@ def _sanitize_for_terminal(text: str) -> str:
     spoofing, an OSC-8 hyperlink escape that visually disguises the printed URL) straight into
     the user's terminal via `print`.
     """
-    return _CONTROL_CHAR_PATTERN.sub("", text)
+    return "".join(
+        ch
+        for ch in text
+        if ch in _PRESERVED_WHITESPACE or unicodedata.category(ch) != "Cc"
+    )
 
 
 def format_feed_item_human(item: FeedItem, now: Optional[datetime] = None) -> str:

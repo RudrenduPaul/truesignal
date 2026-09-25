@@ -1,4 +1,6 @@
 """Port of src/truesignal/connectors/telegram.test.ts."""
+from urllib.parse import urlparse
+
 import pytest
 
 from truesignal.connectors.telegram import telegram_connector
@@ -38,7 +40,7 @@ def test_uses_the_official_get_updates_bot_api_method_never_t_me_s_scraping(monk
     items = telegram_connector.fetch_items()
     assert len(items) == 1
     assert items[0].url == "https://t.me/examplechan/5"
-    assert "api.telegram.org" in called_urls[0]
+    assert urlparse(called_urls[0]).hostname == "api.telegram.org"
     assert "getUpdates" in called_urls[0]
     assert "t.me/s/" not in called_urls[0]
 
